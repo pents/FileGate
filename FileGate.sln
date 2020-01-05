@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileGate.Api", "FileGate.Api\FileGate.Api.csproj", "{DBD1EF48-837B-4003-8CE8-AC6752D4C842}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBD1EF48-837B-4003-8CE8-AC6752D4C842}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD1EF48-837B-4003-8CE8-AC6752D4C842}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD1EF48-837B-4003-8CE8-AC6752D4C842}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD1EF48-837B-4003-8CE8-AC6752D4C842}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
