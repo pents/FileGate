@@ -21,6 +21,9 @@ namespace FileGate.Api
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                }).ConfigureAppConfiguration((builder, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", false);
                 });
     }
 }

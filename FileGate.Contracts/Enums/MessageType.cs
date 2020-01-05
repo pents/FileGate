@@ -1,8 +1,14 @@
 ﻿using System;
-namespace FileGate.Contracts
+namespace FileGate.Contracts.Enums
 {
     public enum MessageType
     {
-        Connect
+        Connect,
+        Ping,
+        Pong,
+        FileListRequest,
+        FileListResponse,
+        FileRequest,
+        FileResponse
     }
 }

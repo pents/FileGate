@@ -2,45 +2,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FileGate.Application.Services.Abstractions;
+using FileGate.Contracts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Newtonsoft.Json;
 
 namespace FileGate.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiController]
+    [Route("api/[controller]/{UserId}")]
     public class FileController : Controller
     {
-        // GET: api/values
+        private readonly ISocketServer _socketServer;
+
+        public FileController(ISocketServer socketServer)
+        {
+            _socketServer = socketServer;
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        [ProducesResponseType(typeof(FileListMessage), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetFileList(Guid userId)
         {
-            return new string[] { "value1", "value2" };
+            var fileList = await _socketServer.SendWithResult<FileListMessage, MessageBase>(new MessageBase
+            {
+                Type = Contracts.Enums.MessageType.FileListRequest
+            }, userId);
+            return Ok(fileList);
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        //[HttpGet]
+        //[ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+        //public IActionResult GetFile(Guid UserId, [FromQuery]FileIdentifier fileIdentifier)
+        //{
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        //}
     }
 }

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using FileGate.Application.Services.Abstractions;
 using FileGate.Contracts;
 using FileGate.Contracts.Enums;
 using Fleck;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace FileGate.Application.Services.Abstractions
+namespace FileGate.Application.Services
 {
     public class SocketServerEventHandler : ISocketServerEventHandler
     {

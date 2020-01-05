@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileGate.Api", "FileGate.Api\FileGate.Api.csproj", "{DBD1EF48-837B-4003-8CE8-AC6752D4C842}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileGate.Application", "FileGate.Application\FileGate.Application.csproj", "{DE86FEEF-E9D2-4ABA-B743-F892AEB5172E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileGate.Client", "FileGate.Client\FileGate.Client.csproj", "{48B3A163-902C-4FB7-9E13-0D007F2D564E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileGate.Contracts", "FileGate.Contracts\FileGate.Contracts.csproj", "{BF56F428-EB68-4CD7-847F-819BC7821C25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,5 +19,17 @@ Global
 		{DBD1EF48-837B-4003-8CE8-AC6752D4C842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBD1EF48-837B-4003-8CE8-AC6752D4C842}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBD1EF48-837B-4003-8CE8-AC6752D4C842}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE86FEEF-E9D2-4ABA-B743-F892AEB5172E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE86FEEF-E9D2-4ABA-B743-F892AEB5172E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE86FEEF-E9D2-4ABA-B743-F892AEB5172E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE86FEEF-E9D2-4ABA-B743-F892AEB5172E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48B3A163-902C-4FB7-9E13-0D007F2D564E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48B3A163-902C-4FB7-9E13-0D007F2D564E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48B3A163-902C-4FB7-9E13-0D007F2D564E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48B3A163-902C-4FB7-9E13-0D007F2D564E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF56F428-EB68-4CD7-847F-819BC7821C25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF56F428-EB68-4CD7-847F-819BC7821C25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF56F428-EB68-4CD7-847F-819BC7821C25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF56F428-EB68-4CD7-847F-819BC7821C25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
