@@ -1,9 +1,9 @@
 ﻿using System;
-namespace FileGate.Application.Configuration
+namespace FileGate.Api.Dto.Configuration
 {
     public class ServerConfiguration
     {
-        public string IP { get; set; }
+        public string Ip { get; set; }
         public int Port { get; set; }
     }
 }

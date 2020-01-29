@@ -10,7 +10,7 @@ namespace FileGate.Api.Composition
         public static IServiceCollection AddApplicationDependensies(this IServiceCollection services)
         {
             return services
-                .AddSingleton<ISocketServerEventHandler, SocketServerEventHandler>()
+                .AddHttpContextAccessor()
                 .AddSingleton<ISocketServer, SocketServer>();
         }
     }

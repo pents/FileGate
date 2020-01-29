@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FileGate.Api.Composition;
+using FileGate.Api.Middlewares;
 using FileGate.Application.Services.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,13 +28,13 @@ namespace FileGate.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddControllers();
             services.AddMvc(options =>
             {
                 options.EnableEndpointRouting = false;
             });
             services.AddApplicationDependensies();
             services.AddApplicationOptions(Configuration);
+            
             services.AddLogging(options =>
             {
                 options.AddConsole().AddConfiguration(Configuration);
@@ -49,9 +50,13 @@ namespace FileGate.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseMvc();
             app.UseWebSockets();
-            serviceProvider.GetRequiredService<ISocketServer>().Start();
+            app.UseMiddleware<ExceptionMiddleware>();
+
+
+
+
+            app.UseMvc();
         }
     }
 }

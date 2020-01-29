@@ -1,82 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
+using System.Net.Http;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
+using FileGate.Application.Exceptions;
 using FileGate.Application.Services.Abstractions;
-using FileGate.Application.Configuration;
-using Fleck;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using FileGate.Contracts;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace FileGate.Application.Services
 {
     public class SocketServer : ISocketServer
     {
-        private readonly ServerConfiguration _serverOptions;
-        private readonly IWebSocketServer _socketServer;
-        private readonly ISocketServerEventHandler _eventHandler;
+        private readonly Dictionary<Guid, ISocketConnection> _connectedClients;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public SocketServer(IOptions<ServerConfiguration> serverOptions, ISocketServerEventHandler eventHandler)
+        public SocketServer(IHttpContextAccessor contextAccessor)
         {
-            _serverOptions = serverOptions.Value;
-            var server = new WebSocketServer($"ws://{_serverOptions.IP}:{_serverOptions.Port}/socket");
-            _socketServer = server;
-            _eventHandler = eventHandler;
+            _contextAccessor = contextAccessor;
+            _connectedClients = new Dictionary<Guid, ISocketConnection>();
         }
 
-        public Task Send<TIn>(TIn data, Guid clientId)
+        public Task<ISocketConnection> GetSocket(Guid clientId)
         {
-            var socket = _eventHandler.GetSocket(clientId);
-
-            socket.Send(JsonConvert.SerializeObject(data));
-
-            return Task.CompletedTask;
+            return Task.FromResult(_connectedClients[clientId]);
         }
 
-        public async Task<TResult> SendWithResult<TResult, TIn>(TIn data, Guid clientId)
+        public async Task<TResult> Receive<TResult>(Guid clientId)
         {
-            var socket = _eventHandler.GetSocket(clientId);
+            return await _connectedClients[clientId].GetMessage<TResult>();
+        }
 
-            var currentHandler = socket.OnMessage;
-
-            socket.OnMessage -= currentHandler;
-
-            TResult result = default;
-
-            socket.OnMessage += (message) =>
+        public async Task ReceiveConnection()
+        {
+            if (_contextAccessor.HttpContext.WebSockets.IsWebSocketRequest)
             {
-                result = JsonConvert.DeserializeObject<TResult>(message);
-
-                socket.OnMessage -= (Action<string>)socket.OnMessage.GetInvocationList()[0];
-
-                socket.OnMessage += currentHandler;
-            };
-
-            await socket.Send(JsonConvert.SerializeObject(data));
-
-            return result;
-        }
-
-        public void Start()
-        {
-            _socketServer.Start(socket =>
+                WebSocket socket = await _contextAccessor.HttpContext.WebSockets.AcceptWebSocketAsync();
+                ISocketConnection connection = new SocketConnection(socket);
+                var clientInfo = await connection.GetMessage<ClientInfoMessage>();
+                var clientId = clientInfo.ClientId;
+                _connectedClients.Add(clientId, connection);
+                await connection.Listen();
+            }
+            else
             {
-                socket.OnError = _eventHandler.OnError;
-                socket.OnMessage = (message) => _eventHandler.OnMessage(message, socket);
-                socket.OnBinary = _eventHandler.OnBinary;
-                socket.OnOpen = () => _eventHandler.OnOpen(socket);
-                socket.OnClose = () => _eventHandler.OnClose(socket);
-            });
+                throw new RecieveConnectionException("HttpContext request is not containing socket connection");
+            }
         }
 
-        public void Stop()
+        public async Task Send(Guid clientId, string message)
         {
-            _socketServer.Dispose();
+            try
+            {
+                var client = _connectedClients[clientId];
+
+                await client.Send(message);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new SendMessageException($"Client '{clientId}' is not found");
+            }
+            catch (WebSocketException)
+            {
+                throw new SendMessageException($"Connection to client '{clientId}' is closed or aborted");
+            }
         }
 
+        public async Task<TResult> SendWithResult<TResult>(Guid clientId, string message)
+        {
+            try
+            {
+                var client = _connectedClients[clientId];
+
+                return await client.SendWithResult<TResult>(message);
+            }
+            catch(KeyNotFoundException)
+            {
+                throw new SendMessageException($"Client '{clientId}' is not found");
+            }
+            catch(WebSocketException)
+            {
+                throw new SendMessageException($"Connection to client '{clientId}' is closed or aborted");
+            }
+
+        }
+
+        public async Task<TResult> SendWithResult<TResult>(Guid clientId, object message)
+        {
+            var serializedObject = JsonConvert.SerializeObject(message);
+            return await SendWithResult<TResult>(clientId, serializedObject);
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using FileGate.Application.Configuration;
+using FileGate.Api.Dto.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FileGate.Application.Services.Abstractions;
 using FileGate.Contracts;
@@ -12,7 +10,7 @@ namespace FileGate.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]/{UserId}")]
-    public class FileController : Controller
+    public class FileController : ControllerBase
     {
         private readonly ISocketServer _socketServer;
 
@@ -25,10 +23,10 @@ namespace FileGate.Api.Controllers
         [ProducesResponseType(typeof(FileListMessage), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetFileList(Guid userId)
         {
-            var fileList = await _socketServer.SendWithResult<FileListMessage, MessageBase>(new MessageBase
-            {
-                Type = Contracts.Enums.MessageType.FileListRequest
-            }, userId);
+            var fileList = await _socketServer.SendWithResult<FileListMessage>(
+                userId,
+                new MessageBase { Type = Contracts.Enums.MessageType.FileListRequest });
+
             return Ok(fileList);
         }
 

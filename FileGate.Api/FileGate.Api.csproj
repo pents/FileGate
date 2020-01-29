@@ -10,7 +10,10 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Composition\" />
-    <Folder Include="Models\" />
+    <Folder Include="Middlewares\" />
+    <Folder Include="Dto\" />
+    <Folder Include="Dto\Output\" />
+    <Folder Include="Dto\Configuration\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FileGate.Application\FileGate.Application.csproj">
