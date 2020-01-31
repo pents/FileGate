@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using FileGate.Application.Exceptions;
 using FileGate.Application.Services.Abstractions;
-using FileGate.Contracts;
+using FileGate.Contracts.Dto;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
@@ -38,10 +37,11 @@ namespace FileGate.Application.Services
             {
                 WebSocket socket = await _contextAccessor.HttpContext.WebSockets.AcceptWebSocketAsync();
                 ISocketConnection connection = new SocketConnection(socket);
-                var clientInfo = await connection.GetMessage<ClientInfoMessage>();
+                var clientInfo = await connection.GetMessage<ClientInfoDto>();
                 var clientId = clientInfo.ClientId;
                 _connectedClients.Add(clientId, connection);
                 await connection.Listen();
+                _connectedClients.Remove(clientId);
             }
             else
             {

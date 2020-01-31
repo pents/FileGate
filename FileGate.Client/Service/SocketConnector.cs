@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FileGate.Client.Service.Abstractions;
 using FileGate.Contracts;
+using FileGate.Contracts.Dto;
 using Newtonsoft.Json;
 
 namespace FileGate.Client.Service
@@ -19,6 +20,7 @@ namespace FileGate.Client.Service
         private readonly int _bufferSize;
         private ISocketClientEventHandler _eventHandler;
 
+        #region events
         private event Action OnBeforeStart;
         private event Action OnAfterStart;
         private event Action OnBeforeStop;
@@ -27,7 +29,7 @@ namespace FileGate.Client.Service
         private event Action<string> OnAfterSend;
         private event Action<MemoryStream> OnRecieveText;
         private event Action<MemoryStream> OnRecieveBynary;
-        
+        #endregion
 
         public SocketConnector(int bufferSize = 1024, ISocketClientEventHandler clientEventHandler = null)
         {
@@ -50,7 +52,6 @@ namespace FileGate.Client.Service
             OnRecieveBynary += _eventHandler.RecieveBynary;
         }
 
-
         public async Task StartClient(Uri uri)
         {
             OnBeforeStart?.Invoke();
@@ -59,7 +60,7 @@ namespace FileGate.Client.Service
    
             StartListening(_client, token: _tokenSource.Token).ConfigureAwait(false);
 
-            await Send(new ClientInfoMessage
+            await Send(new ClientInfoDto
             {
                 ClientId = _currentClientId,
                 Type = Contracts.Enums.MessageType.Connect
@@ -79,13 +80,16 @@ namespace FileGate.Client.Service
             while (currentByte <= bytesCount)
             {
                 bool lastChunk = currentByte + _bufferSize > bytesCount;
+
+                var count = lastChunk ? bytesCount - currentByte : _bufferSize;
+
                 await _client.SendAsync(
-                    new ArraySegment<byte>(byteData, currentByte, lastChunk ? bytesCount : _bufferSize),
+                    new ArraySegment<byte>(byteData, currentByte, count),
                     WebSocketMessageType.Text,
                     lastChunk,
                     _tokenSource.Token);
-                
-              
+
+
                 currentByte += _bufferSize;
             }
 
@@ -97,11 +101,6 @@ namespace FileGate.Client.Service
             var textData = JsonConvert.SerializeObject(sendObj);
 
             await Send(textData);
-        }
-
-        public async Task Send<T>(T obj, int bufferSize, CancellationToken token)
-        {
-            await Send(obj, bufferSize, token);
         }
 
         public Task StopClient()
@@ -118,7 +117,6 @@ namespace FileGate.Client.Service
             return _currentClientId;
         }
 
-
         private async Task StartListening(WebSocket socket, int bufferSize = 1024, CancellationToken token = default)
         {
             while(true && !token.IsCancellationRequested)
@@ -126,7 +124,6 @@ namespace FileGate.Client.Service
                 await Recieve(socket, bufferSize, token);
             }
         }
-
 
         private async Task Recieve(WebSocket socket, int bufferSize = 1024, CancellationToken token = default)
         {

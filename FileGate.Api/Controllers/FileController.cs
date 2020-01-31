@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FileGate.Application.Services.Abstractions;
 using FileGate.Contracts;
+using FileGate.Contracts.Dto;
+using FileGate.Contracts.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace FileGate.Api.Controllers
 {
@@ -20,21 +22,28 @@ namespace FileGate.Api.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(FileListMessage), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<FileInfo>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetFileList(Guid userId)
         {
-            var fileList = await _socketServer.SendWithResult<FileListMessage>(
+            var fileList = await _socketServer.SendWithResult<IEnumerable<FileInfo>>(
                 userId,
                 new MessageBase { Type = Contracts.Enums.MessageType.FileListRequest });
 
             return Ok(fileList);
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
-        //public IActionResult GetFile(Guid UserId, [FromQuery]FileIdentifier fileIdentifier)
-        //{
+        [HttpGet]
+        [Route("{fileIdentifier}")]
+        [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetFile(Guid userId, string fileIdentifier)
+        {
+            var fileData = await _socketServer.SendWithResult<FileData>(userId, new FileDataRequestDto
+            {
+                Hash = fileIdentifier,
+                Type = Contracts.Enums.MessageType.FileRequest
+            });
 
-        //}
+            return new FileContentResult(fileData.Data, "application/octet-stream");
+        }
     }
 }

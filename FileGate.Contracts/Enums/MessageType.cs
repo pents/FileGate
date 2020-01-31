@@ -9,6 +9,7 @@ namespace FileGate.Contracts.Enums
         FileListRequest,
         FileListResponse,
         FileRequest,
-        FileResponse
+        FileResponse,
+        Disconnect
     }
 }

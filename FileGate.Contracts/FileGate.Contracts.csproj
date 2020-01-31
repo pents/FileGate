@@ -6,5 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Enums\" />
+    <Folder Include="Dto\" />
+    <Folder Include="Entities\" />
   </ItemGroup>
 </Project>

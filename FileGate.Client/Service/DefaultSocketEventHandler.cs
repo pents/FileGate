@@ -1,9 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using FileGate.Client.Service.Abstractions;
 using FileGate.Contracts;
+using FileGate.Contracts.Dto;
 using FileGate.Contracts.Enums;
 using Newtonsoft.Json;
 
@@ -74,23 +77,32 @@ namespace FileGate.Client.Service
                     case MessageType.FileListRequest:
                         OnFileListRequest().ConfigureAwait(false);
                         break;
+
+                    case MessageType.FileRequest:
+                        var fileRequest = JsonConvert.DeserializeObject<FileDataRequestDto>(messageText);
+                        OnFileRequest(fileRequest.Hash).ConfigureAwait(false);
+                        break;
                 }
             }
+        }
+
+        private async Task OnFileRequest(string fileId)
+        {
+            var filedata = FileConnector.GetFileData(fileId);
+
+            await _socketConnector.Send(JsonConvert.SerializeObject(filedata));
         }
 
         private async Task OnFileListRequest()
         {
             var files = FileConnector.GetFilesInfoList();
 
-            var fileList = new FileListMessage();
-            foreach (var fileInfo in files)
+            var fileList = files.Select((file) => new Contracts.Entities.FileInfo
             {
-                fileList.Files.Add(new Contracts.FileInfo
-                {
-                    FullName = fileInfo.Name,
-                    Size = fileInfo.Length
-                });
-            }
+                Id = FileConnector.GetHashSha256(file.Name + file.Length),
+                FullName = file.Name,
+                Size = file.Length
+            });
 
             await _socketConnector.Send(JsonConvert.SerializeObject(fileList));
         }
@@ -102,12 +114,13 @@ namespace FileGate.Client.Service
 
         private async Task OnConnectMessage()
         {
-            await _socketConnector.Send(new ClientInfoMessage
+            await _socketConnector.Send(new ClientInfoDto
             {
                 ClientId = _socketConnector.GetCurrentClientId(),
                 Type = MessageType.Connect
             });
         }
+
 
     }
 

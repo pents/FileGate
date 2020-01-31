@@ -1,9 +1,9 @@
 ﻿using System;
-namespace FileGate.Contracts
+namespace FileGate.Contracts.Dto
 {
-    public class ClientInfoMessage : MessageBase
+    public class ClientInfoDto : MessageBase
     {
-        public ClientInfoMessage()
+        public ClientInfoDto()
         {
             Type = Enums.MessageType.Connect;
         }
