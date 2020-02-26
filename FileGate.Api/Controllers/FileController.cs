@@ -27,8 +27,8 @@ namespace FileGate.Api.Controllers
         {
             var fileList = await _socketServer.SendWithResult<IEnumerable<FileInfo>>(
                 userId,
-                new MessageBase { Type = Contracts.Enums.MessageType.FileListRequest });
-
+                new MessageBase { Type = Contracts.Enums.MessageType.FILE_LIST_REQUEST });
+            
             return Ok(fileList);
         }
 
@@ -40,10 +40,10 @@ namespace FileGate.Api.Controllers
             var fileData = await _socketServer.SendWithResult<FileData>(userId, new FileDataRequestDto
             {
                 Hash = fileIdentifier,
-                Type = Contracts.Enums.MessageType.FileRequest
+                Type = Contracts.Enums.MessageType.FILE_REQUEST
             });
 
-            return new FileContentResult(fileData.Data, "application/octet-stream");
+            return File(fileData.Data, "application/octet-stream", fileData.FileInfo.FullName);
         }
     }
 }

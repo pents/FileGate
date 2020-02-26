@@ -3,13 +3,13 @@ namespace FileGate.Contracts.Enums
 {
     public enum MessageType
     {
-        Connect,
-        Ping,
-        Pong,
-        FileListRequest,
-        FileListResponse,
-        FileRequest,
-        FileResponse,
-        Disconnect
+        CONNECT,
+        PING,
+        PONG,
+        FILE_LIST_REQUEST,
+        FILE_LIST_RESPONSE,
+        FILE_REQUEST,
+        FILE_RESPONSE,
+        DISCONNECT
     }
 }

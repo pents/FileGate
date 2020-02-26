@@ -15,13 +15,13 @@ namespace FileGate.Client.Service
 
         public static IEnumerable<FileInfo> GetFilesInfoList(string path = null)
         {
-            List<FileInfo> infos = new List<FileInfo>();
+            var infos = new List<FileInfo>();
             var dir = new DirectoryInfo(path ?? ConnectedPath);
             infos.AddRange(dir.GetFiles().Select(file => file));
 
             // Recurse into subdirectories of this directory.
-            string[] subdirectoryEntries = Directory.GetDirectories(path ?? ConnectedPath);
-            foreach (string subdirectory in subdirectoryEntries)
+            var subdirectoryEntries = Directory.GetDirectories(path ?? ConnectedPath);
+            foreach (var subdirectory in subdirectoryEntries)
             {
                 infos.AddRange(GetFilesInfoList(subdirectory));
             }
@@ -31,31 +31,26 @@ namespace FileGate.Client.Service
 
         public static FileData GetFileData(string fileId)
         {
-            var file = GetFilesInfoList().FirstOrDefault(file => GetHashSha256(file.Name + file.Length.ToString()) == fileId);
+            var _file = GetFilesInfoList().FirstOrDefault(file => GetHashSha256(file.Name + file.Length) == fileId);
 
             return new FileData
             {
                 FileInfo = new Contracts.Entities.FileInfo
                 {
-                    FullName = file.Name,
+                    FullName = _file.Name,
                     Id = fileId,
-                    Size = file.Length
+                    Size = _file.Length
                 },
-                Data = File.ReadAllBytes(file.FullName)
+                Data = File.ReadAllBytes(_file.FullName)
             };
         }
 
         public static string GetHashSha256(string text)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            SHA256Managed hashstring = new SHA256Managed();
-            byte[] hash = hashstring.ComputeHash(bytes);
-            string hashString = string.Empty;
-            foreach (byte x in hash)
-            {
-                hashString += string.Format("{0:x2}", x);
-            }
-            return hashString;
+            var bytes = Encoding.UTF8.GetBytes(text);
+            var hashstring = new SHA256Managed();
+            var hash = hashstring.ComputeHash(bytes);
+            return hash.Aggregate(string.Empty, (current, x) => current + $"{x:x2}");
         }
 
     }

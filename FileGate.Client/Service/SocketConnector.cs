@@ -63,7 +63,7 @@ namespace FileGate.Client.Service
             await Send(new ClientInfoDto
             {
                 ClientId = _currentClientId,
-                Type = Contracts.Enums.MessageType.Connect
+                Type = Contracts.Enums.MessageType.CONNECT
             });
 
             OnAfterStart?.Invoke();

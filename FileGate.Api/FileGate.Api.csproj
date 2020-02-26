@@ -10,7 +10,7 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Composition\" />
-    <Folder Include="Middlewares\" />
+    <Folder Include="Middleware\" />
     <Folder Include="Dto\" />
     <Folder Include="Dto\Output\" />
     <Folder Include="Dto\Configuration\" />
@@ -22,5 +22,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\Views\index.html" />
   </ItemGroup>
 </Project>

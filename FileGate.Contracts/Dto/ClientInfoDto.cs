@@ -5,7 +5,7 @@ namespace FileGate.Contracts.Dto
     {
         public ClientInfoDto()
         {
-            Type = Enums.MessageType.Connect;
+            Type = Enums.MessageType.CONNECT;
         }
 
         public Guid ClientId { get; set; }

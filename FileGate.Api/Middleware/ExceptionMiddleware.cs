@@ -6,7 +6,7 @@ using FileGate.Api.Dto.Output;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 
-namespace FileGate.Api.Middlewares
+namespace FileGate.Api.Middleware
 {
     public class ExceptionMiddleware
     {

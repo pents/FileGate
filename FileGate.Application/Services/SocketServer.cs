@@ -45,7 +45,7 @@ namespace FileGate.Application.Services
             }
             else
             {
-                throw new RecieveConnectionException("HttpContext request is not containing socket connection");
+                throw new ReceiveConnectionException("HttpContext request is not containing socket connection");
             }
         }
 

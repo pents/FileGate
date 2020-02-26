@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using FileGate.Client.Service.Abstractions;
@@ -66,19 +65,19 @@ namespace FileGate.Client.Service
                 // instead of this:
                 switch (recievedMessage.Type)
                 {
-                    case MessageType.Connect:
+                    case MessageType.CONNECT:
                         OnConnectMessage().ConfigureAwait(false);
                         break;
 
-                    case MessageType.Ping:
+                    case MessageType.PING:
                         OnPing().ConfigureAwait(false);
                         break;
 
-                    case MessageType.FileListRequest:
+                    case MessageType.FILE_LIST_REQUEST:
                         OnFileListRequest().ConfigureAwait(false);
                         break;
 
-                    case MessageType.FileRequest:
+                    case MessageType.FILE_REQUEST:
                         var fileRequest = JsonConvert.DeserializeObject<FileDataRequestDto>(messageText);
                         OnFileRequest(fileRequest.Hash).ConfigureAwait(false);
                         break;
@@ -109,7 +108,7 @@ namespace FileGate.Client.Service
 
         private async Task OnPing()
         {
-            await _socketConnector.Send(new MessageBase { Type = MessageType.Pong });
+            await _socketConnector.Send(new MessageBase { Type = MessageType.PONG });
         }
 
         private async Task OnConnectMessage()
@@ -117,7 +116,7 @@ namespace FileGate.Client.Service
             await _socketConnector.Send(new ClientInfoDto
             {
                 ClientId = _socketConnector.GetCurrentClientId(),
-                Type = MessageType.Connect
+                Type = MessageType.CONNECT
             });
         }
 

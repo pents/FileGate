@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FileGate.Api.Composition;
-using FileGate.Api.Middlewares;
-using FileGate.Application.Services.Abstractions;
+using FileGate.Api.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,10 +22,20 @@ namespace FileGate.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+                             {
+                                 options.AddPolicy("CorsPolicy",
+                                     builder =>
+                                     {
+                                         builder.AllowAnyOrigin();
+                                     });
+                             });
+            
             services.AddMvc(options =>
             {
                 options.EnableEndpointRouting = false;
             });
+            
             services.AddApplicationDependensies();
             services.AddApplicationOptions(Configuration);
             
@@ -52,7 +56,7 @@ namespace FileGate.Api
             }
             app.UseWebSockets();
             app.UseMiddleware<ExceptionMiddleware>();
-
+            app.UseCors("CorsPolicy");
 
 
 
