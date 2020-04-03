@@ -72,7 +72,7 @@ namespace FileGate.Application.Services
 
         public async Task Listen()
         {
-            while(true && !_token.IsCancellationRequested)
+            while(!_token.IsCancellationRequested)
             {
                 _currentMessage = await Receive();
             }
@@ -87,6 +87,7 @@ namespace FileGate.Application.Services
 
             return await GetMessage<TResult>();
         }
+        
 
         private async Task<string> Receive()
         {
