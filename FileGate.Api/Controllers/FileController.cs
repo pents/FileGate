@@ -23,7 +23,7 @@ namespace FileGate.Api.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<FileInfo>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetFileList(Guid userId)
+        public async Task<IActionResult> GetFileList(string userId)
         {
             var fileList = await _socketServer.SendWithResult<IEnumerable<FileInfo>>(
                 userId,
@@ -35,7 +35,7 @@ namespace FileGate.Api.Controllers
         [HttpGet]
         [Route("{fileIdentifier}")]
         [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetFile(Guid userId, string fileIdentifier)
+        public async Task<IActionResult> GetFile(string userId, string fileIdentifier)
         {
             var fileData = await _socketServer.SendWithResult<FileData>(userId, new FileDataRequestDto
             {

@@ -12,21 +12,21 @@ namespace FileGate.Application.Services
 {
     public class SocketServer : ISocketServer
     {
-        private readonly Dictionary<Guid, ISocketConnection> _connectedClients;
+        private readonly Dictionary<string, ISocketConnection> _connectedClients;
         private readonly IHttpContextAccessor _contextAccessor;
 
         public SocketServer(IHttpContextAccessor contextAccessor)
         {
             _contextAccessor = contextAccessor;
-            _connectedClients = new Dictionary<Guid, ISocketConnection>();
+            _connectedClients = new Dictionary<string, ISocketConnection>();
         }
 
-        public Task<ISocketConnection> GetSocket(Guid clientId)
+        public Task<ISocketConnection> GetSocket(string clientId)
         {
             return Task.FromResult(_connectedClients[clientId]);
         }
 
-        public async Task<TResult> Receive<TResult>(Guid clientId)
+        public async Task<TResult> Receive<TResult>(string clientId)
         {
             return await _connectedClients[clientId].GetMessage<TResult>();
         }
@@ -49,7 +49,7 @@ namespace FileGate.Application.Services
             }
         }
 
-        public async Task Send(Guid clientId, string message)
+        public async Task Send(string clientId, string message)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace FileGate.Application.Services
             }
         }
 
-        public async Task<TResult> SendWithResult<TResult>(Guid clientId, string message)
+        public async Task<TResult> SendWithResult<TResult>(string clientId, string message)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace FileGate.Application.Services
 
         }
 
-        public async Task<TResult> SendWithResult<TResult>(Guid clientId, object message)
+        public async Task<TResult> SendWithResult<TResult>(string clientId, object message)
         {
             var serializedObject = JsonConvert.SerializeObject(message);
             return await SendWithResult<TResult>(clientId, serializedObject);

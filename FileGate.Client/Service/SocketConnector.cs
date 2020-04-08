@@ -14,7 +14,7 @@ namespace FileGate.Client.Service
 {
     public class SocketConnector
     {
-        private readonly Guid _currentClientId;
+        private readonly string _currentClientId;
         private readonly CancellationTokenSource _tokenSource;
         private readonly ClientWebSocket _client;
         private readonly int _bufferSize;
@@ -36,7 +36,9 @@ namespace FileGate.Client.Service
             _bufferSize = bufferSize;
             _tokenSource = new CancellationTokenSource();
             _client = new ClientWebSocket();
-            _currentClientId = Guid.NewGuid();
+            var buffer = new byte[4];
+            new Random().NextBytes(buffer);
+            _currentClientId = BytesToString(buffer);
             _eventHandler = clientEventHandler ?? new DefaultSocketEventHandler(this);
 
             OnBeforeStart += _eventHandler.BeforeStart;
@@ -112,7 +114,7 @@ namespace FileGate.Client.Service
             return Task.CompletedTask;
         }
 
-        public Guid GetCurrentClientId()
+        public string GetCurrentClientId()
         {
             return _currentClientId;
         }
@@ -150,6 +152,17 @@ namespace FileGate.Client.Service
                         break;
                 }
             }
+        }
+
+        private string BytesToString(byte[] array)
+        {
+            StringBuilder builder = new StringBuilder();  
+            for (int i = 0; i < array.Length; i++)  
+            {  
+                builder.Append(array[i].ToString("x2"));  
+            }
+
+            return builder.ToString();
         }
 
     }

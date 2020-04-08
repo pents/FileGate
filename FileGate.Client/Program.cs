@@ -31,7 +31,7 @@ namespace FileGate.Client
             {
                 FileConnector.ConnectedPath = commandLineArgs.Path;
                 var connector = new SocketConnector();
-                await connector.StartClient(new Uri("ws://localhost:8095/socket"));
+                await connector.StartClient(new Uri("ws://192.168.1.83:8095/socket"));
              
                 while (true)
                 {
