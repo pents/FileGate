@@ -7,7 +7,7 @@ namespace FileGate.Contracts.Dto
         {
             Type = Enums.MessageType.CONNECT;
         }
-
+        
         public string ClientId { get; set; }
     }
 }

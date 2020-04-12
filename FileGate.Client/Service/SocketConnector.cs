@@ -14,7 +14,7 @@ namespace FileGate.Client.Service
 {
     public class SocketConnector
     {
-        private readonly string _currentClientId;
+        private string _currentClientId;
         private readonly CancellationTokenSource _tokenSource;
         private readonly ClientWebSocket _client;
         private readonly int _bufferSize;
@@ -36,9 +36,7 @@ namespace FileGate.Client.Service
             _bufferSize = bufferSize;
             _tokenSource = new CancellationTokenSource();
             _client = new ClientWebSocket();
-            var buffer = new byte[4];
-            new Random().NextBytes(buffer);
-            _currentClientId = BytesToString(buffer);
+
             _eventHandler = clientEventHandler ?? new DefaultSocketEventHandler(this);
 
             OnBeforeStart += _eventHandler.BeforeStart;
@@ -58,15 +56,9 @@ namespace FileGate.Client.Service
         {
             OnBeforeStart?.Invoke();
             await _client.ConnectAsync(uri, _tokenSource.Token);
-            Console.WriteLine($"Current file URL: http://localhost:8095/File/{_currentClientId}");
+            //Console.WriteLine($"Current file URL: http://localhost:8095/File/{_currentClientId}");
    
             StartListening(_client, token: _tokenSource.Token).ConfigureAwait(false);
-
-            await Send(new ClientInfoDto
-            {
-                ClientId = _currentClientId,
-                Type = Contracts.Enums.MessageType.CONNECT
-            });
 
             OnAfterStart?.Invoke();
         }
@@ -114,14 +106,14 @@ namespace FileGate.Client.Service
             return Task.CompletedTask;
         }
 
-        public string GetCurrentClientId()
+        public void SetClientId(string clientId)
         {
-            return _currentClientId;
+            _currentClientId = clientId;
         }
 
         private async Task StartListening(WebSocket socket, int bufferSize = 1024, CancellationToken token = default)
         {
-            while(true && !token.IsCancellationRequested)
+            while(!token.IsCancellationRequested)
             {
                 await Recieve(socket, bufferSize, token);
             }
@@ -141,7 +133,6 @@ namespace FileGate.Client.Service
                 while (!result.EndOfMessage);
 
                 ms.Seek(0, SeekOrigin.Begin);
-
                 switch (result.MessageType)
                 {
                     case WebSocketMessageType.Text:
@@ -152,17 +143,6 @@ namespace FileGate.Client.Service
                         break;
                 }
             }
-        }
-
-        private string BytesToString(byte[] array)
-        {
-            StringBuilder builder = new StringBuilder();  
-            for (int i = 0; i < array.Length; i++)  
-            {  
-                builder.Append(array[i].ToString("x2"));  
-            }
-
-            return builder.ToString();
         }
 
     }

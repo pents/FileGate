@@ -43,6 +43,11 @@ namespace FileGate.Application.Services
             return result;
         }
 
+        public async Task Send<T>(T message)
+        {
+            await Send(JsonConvert.SerializeObject(message));
+        }
+
         public async Task Send(string message)
         {
             var byteData = Encoding.UTF8.GetBytes(message);

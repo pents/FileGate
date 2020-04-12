@@ -66,7 +66,7 @@ namespace FileGate.Client.Service
                 switch (recievedMessage.Type)
                 {
                     case MessageType.CONNECT:
-                        OnConnectMessage().ConfigureAwait(false);
+                        OnConnectMessage(JsonConvert.DeserializeObject<ClientInfoDto>(messageText)).ConfigureAwait(false);
                         break;
 
                     case MessageType.PING:
@@ -94,7 +94,7 @@ namespace FileGate.Client.Service
 
         private async Task OnFileListRequest()
         {
-            var files = FileConnector.GetFilesInfoList();
+            var files = FileConnector.GetFilesInfoList(FileConnector.ConnectedPath);
 
             var fileList = files.Select((file) => new Contracts.Entities.FileInfo
             {
@@ -111,13 +111,10 @@ namespace FileGate.Client.Service
             await _socketConnector.Send(new MessageBase { Type = MessageType.PONG });
         }
 
-        private async Task OnConnectMessage()
+        private async Task OnConnectMessage(ClientInfoDto message)
         {
-            await _socketConnector.Send(new ClientInfoDto
-            {
-                ClientId = _socketConnector.GetCurrentClientId(),
-                Type = MessageType.CONNECT
-            });
+            await Task.Run(() => _socketConnector.SetClientId(message.ClientId));
+            Console.WriteLine($"Client ID: {message.ClientId}");
         }
 
 

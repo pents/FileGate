@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Text;
 using System.Threading.Tasks;
 using FileGate.Application.Exceptions;
 using FileGate.Application.Services.Abstractions;
 using FileGate.Contracts.Dto;
+using FileGate.Contracts.Enums;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
@@ -35,11 +37,15 @@ namespace FileGate.Application.Services
         {
             if (_contextAccessor.HttpContext.WebSockets.IsWebSocketRequest)
             {
-                WebSocket socket = await _contextAccessor.HttpContext.WebSockets.AcceptWebSocketAsync();
+                var socket = await _contextAccessor.HttpContext.WebSockets.AcceptWebSocketAsync();
                 ISocketConnection connection = new SocketConnection(socket);
-                var clientInfo = await connection.GetMessage<ClientInfoDto>();
-                var clientId = clientInfo.ClientId;
+                var clientId = GenerateClientId();
                 _connectedClients.Add(clientId, connection);
+                await connection.Send(new ClientInfoDto
+                {
+                    Type = MessageType.CONNECT,
+                    ClientId = clientId
+                });
                 await connection.Listen();
                 _connectedClients.Remove(clientId);
             }
@@ -90,6 +96,34 @@ namespace FileGate.Application.Services
         {
             var serializedObject = JsonConvert.SerializeObject(message);
             return await SendWithResult<TResult>(clientId, serializedObject);
+        }
+
+        private string GenerateClientId()
+        {
+            var buffer = new byte[4];
+            var rand = new Random();
+            while (true)
+            {
+                rand.NextBytes(buffer);
+                var id = BytesToString(buffer);
+                if (_connectedClients.ContainsKey(id))
+                {
+                    continue;
+                }
+
+                return id;
+            }
+        }
+
+        private string BytesToString(byte[] array)
+        {
+            var builder = new StringBuilder();  
+            for (int i = 0; i < array.Length; i++)  
+            {  
+                builder.Append(array[i].ToString("x2"));  
+            }
+
+            return builder.ToString();
         }
     }
 }
